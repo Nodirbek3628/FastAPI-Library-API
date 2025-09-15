@@ -13,11 +13,19 @@ BASE.metadata.create_all(engine)
 
 @app.get("/api/book/{book_id}")
 async def get_book(
-    book_id:Annotated[int,Path(title='bitta kitob id si',gt=1,lt=100)]
+    book_id:Annotated[int,Path(title='bitta kitob id si',ge=0,le=100)]):
 
-):
+    db = Session()
+    result = db.query(Book).filter(Book.book_id == book_id).first()
+    if result:
+        return{
+            "id":result.book_id,
+            "title":result.title,
+            "description":result.description,
+            "author":result.author,
+        }
     return {
-        "book":book_id
+        "messega":"Mavjud emas 404"
     }
 
 @app.get("/api/users/{message}")
@@ -65,3 +73,4 @@ async def create_book(
     db.add(book)
     db.commit()
     return {}
+git 

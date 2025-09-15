@@ -12,7 +12,7 @@ class Genre(str,Enum):
 class Book(BASE):
     __tablename__ = "books"
 
-    booK_id = Column('id',Integer,primary_key=True,nullable=False,index=True)
+    book_id = Column('id',Integer,primary_key=True,nullable=False,index=True)
     title = Column(String(length=30),nullable=False)
     author = Column(String(length=30),nullable=False)
     pages = Column(Integer,CheckConstraint("pages>=1"),nullable=False)  # bu chek qilish
