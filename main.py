@@ -2,10 +2,13 @@ from enum import Enum
 from typing import Annotated
 from fastapi import FastAPI,Path,Query
 from pydantic import BaseModel,Field
+from database import BASE,engine,Session
+from models import *
 
 
 app = FastAPI(title="NT practe")
 
+BASE.metadata.create_all(engine)
 
 
 @app.get("/api/book/{book_id}")
@@ -37,17 +40,28 @@ class Genre(str,Enum):
     romance = "romance"
   
 
-class Book(BaseModel):
-    title:Annotated[str,Field(title="kitob nomi",min_length=5,max_length=30)]
-    author:Annotated[str,Field(title="kitob muallifi",min_length=5,max_length=30)]
+class BookCREATE(BaseModel):
+    title:Annotated[str,Field(title="kitob nomi",min_length=1,max_length=30)]
+    author:Annotated[str,Field(title="kitob muallifi",min_length=1,max_length=30)]
     pages:Annotated[int,Field(title="varoqlar soni",gt=5,lt=30)]
     description:str | None = Field(default=None,title='Tarif', )    #Ixtiyoriy
     genre:Genre
 
-@app.post("/api/books/")
-async def post_book(
-    book:Book
 
-):
-    print(book.model_dump())
-    return {"book": book}
+@app.post("/api/books/")
+async def create_book(
+    book_data:BookCREATE
+    ):
+    db = Session()
+    book = Book(
+        title=book_data.title,
+        author=book_data.author,
+        pages=book_data.pages,
+        description=book_data.description,
+        genre=book_data.genre
+
+    )
+
+    db.add(book)
+    db.commit()
+    return {}
