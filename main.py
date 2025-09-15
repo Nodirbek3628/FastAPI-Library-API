@@ -55,7 +55,7 @@ class BookCREATE(BaseModel):
     description:str | None = Field(default=None,title='Tarif', )    #Ixtiyoriy
     genre:Genre
 
-
+ # CREAT post 
 @app.post("/api/books/")
 async def create_book(
     book_data:BookCREATE
@@ -73,4 +73,44 @@ async def create_book(
     db.add(book)
     db.commit()
     return {}
-git 
+
+ # UPDATE PUT
+@app.put("/api/book/{book_id}")
+async def update_book(
+    book_id: Annotated[int, Path(title='Kitob ID si', ge=0, le=100)],
+    book_data: BookCREATE
+):
+    db = Session()
+    book = db.query(Book).filter(Book.book_id == book_id).first()
+    if book:
+        book.title = book_data.title
+        book.author = book_data.author
+        book.pages = book_data.pages
+        book.description = book_data.description
+        book.genre = book_data.genre
+        db.commit()
+        return {
+            "message": "Kitob muvaffaqiyatli yangilandi"
+        }
+    return {
+        "message": "Kitob topilmadi"
+    }
+
+# DELETE    
+# 
+        
+@app.delete("/api/book/{book_id}")
+async def delete_book(              
+    book_id: Annotated[int, Path(title='Kitob ID si', ge=0, le=100)]
+):
+    db = Session()
+    book = db.query(Book).filter(Book.book_id == book_id).first()
+    if book:
+        db.delete(book)
+        db.commit()
+        return {
+            "message": "Kitob muvaffaqiyatli o'chirildi"
+        }
+    return {
+        "message": "Kitob topilmadi"
+    }       
